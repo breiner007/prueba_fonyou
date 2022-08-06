@@ -1,0 +1,105 @@
+
+-- Database: prueba_fonyou
+
+CREATE DATABASE prueba_fonyou
+    WITH
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'Spanish_Colombia.1252'
+    LC_CTYPE = 'Spanish_Colombia.1252'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
+
+
+
+ CREATE TABLE IF NOT EXISTS public.estudiante
+ (
+     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+     nombre character varying(200) COLLATE pg_catalog."default" NOT NULL,
+     edad character varying(10) COLLATE pg_catalog."default" NOT NULL,
+     ciudad character varying(100) COLLATE pg_catalog."default" NOT NULL,
+     zona_horaria character varying(100) COLLATE pg_catalog."default" NOT NULL,
+     CONSTRAINT estudiante_pkey PRIMARY KEY (id)
+ )
+ TABLESPACE pg_default;
+
+
+CREATE TABLE IF NOT EXISTS public.examen
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    nombre character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT examen_pkey PRIMARY KEY (id)
+)
+TABLESPACE pg_default;
+
+
+CREATE TABLE IF NOT EXISTS public.preguntas
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    pregunta character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    fk_id_examen integer NOT NULL,
+    CONSTRAINT preguntas_pkey PRIMARY KEY (id),
+    CONSTRAINT "fk_idExamen" FOREIGN KEY (fk_id_examen)
+        REFERENCES public.examen (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+)
+TABLESPACE pg_default;
+
+
+CREATE TABLE IF NOT EXISTS public.opciones
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    opcion character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    es_correcta boolean NOT NULL,
+    fk_id_pregunta integer NOT NULL,
+    letra character varying(2) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT opciones_pkey PRIMARY KEY (id),
+    CONSTRAINT "fk_idPregunta" FOREIGN KEY (fk_id_pregunta)
+        REFERENCES public.preguntas (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+TABLESPACE pg_default;
+
+
+CREATE TABLE IF NOT EXISTS public.examenx_estudiante
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    fk_id_examen integer NOT NULL,
+    fecha_presentacion character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    fk_id_estudiante integer NOT NULL,
+    calificacion character varying(20) COLLATE pg_catalog."default",
+    CONSTRAINT "examenxEstudiante_pkey" PRIMARY KEY (id),
+    CONSTRAINT fk_id_estudiante FOREIGN KEY (fk_id_estudiante)
+        REFERENCES public.estudiante (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
+    CONSTRAINT fk_id_examen FOREIGN KEY (fk_id_examen)
+        REFERENCES public.examen (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+)
+TABLESPACE pg_default;
+
+
+CREATE TABLE IF NOT EXISTS public.preguntax_estudiante
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    fk_id_pregunta integer NOT NULL,
+    fk_id_estudiante integer NOT NULL,
+    respuesta character varying(10) COLLATE pg_catalog."default",
+    CONSTRAINT "preguntaxEstudiante_pkey" PRIMARY KEY (id),
+    CONSTRAINT fk_id_estudiante FOREIGN KEY (fk_id_estudiante)
+        REFERENCES public.estudiante (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_id_pregunta FOREIGN KEY (fk_id_pregunta)
+        REFERENCES public.preguntas (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+TABLESPACE pg_default;
